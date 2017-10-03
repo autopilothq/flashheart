@@ -87,6 +87,21 @@ const client = require('flashheart').createClient({
 });
 ```
 
+Optionally, you can enable `staleIfError` which will start listening to the `stale-if-error` directive as well. This stores the response for the duration of the `stale-if-error` directive as well as the `max-age` and will try to retrieve them in this order:
+
+* `max-age` stored version
+* fresh version
+* `stale-if-error` version
+
+This is enabled simply by passing in the `staleIfError` parameter to `createClient`:
+
+```js
+const client = require('flashheart').createClient({
+  cache: storage,
+  staleIfError: true
+});
+```
+
 The cache varies on _all_ request options (and therefore, headers) by default. If you don't want to vary on a particular header, use the `doNotVary` option:
 
 ```js
@@ -127,6 +142,8 @@ The following metrics are sent from each client:
 |`{name}.responses.{code}`|Counter|Incremented every time a response is received|
 |`{name}.request_errors`|Counter|Incremented every time a request fails (timeout, DNS lookup fails etc.)|
 |`{name}.response_time`|Timer|Measures of the response time in milliseconds across all requests|
+|`{name}.retries`|Counter|Incremented every time the request retries|
+|`{name}.attempts`|Timer|Measures the number of attempts|
 |`{name}.cache.hits`|Counter|Incremented for each cache hit|
 |`{name}.cache.misses`|Counter|Incremented for each cache miss|
 |`{name}.cache.errors`|Counter|Incremented whenever there's is a problem communicating with the cache|
@@ -291,6 +308,14 @@ Creates a new client.
 * `opts` - _optional_ - A set of options. All of the [request options](https://github.com/request/request#requestoptions-callback) are supported
 * `callback` - A function called with the [callback return values](https://github.com/bbc/flashheart#callback-return-values)
 
+### `client.head`
+
+#### Parameters
+
+* `url` - The URL to be requested
+* `opts` - _optional_ - A set of options. All of the [request options](https://github.com/request/request#requestoptions-callback) are supported
+* `callback` - A function called with the [callback return values](https://github.com/bbc/flashheart#callback-return-values)
+
 ### `client.put`
 
 #### Parameters
@@ -325,13 +350,6 @@ Creates a new client.
 * `url` - The URL to be requested
 * `opts` - _optional_ - A set of options. All of the [request options](https://github.com/request/request#requestoptions-callback) are supported
 * `callback` - A function called with the [callback return values](https://github.com/bbc/flashheart#callback-return-values)
-
-## Contributing
-
-* If you're unsure if a feature would make a good addition, you can always [create an issue](https://github.com/bbc/flashheart/issues/new) first.
-* We aim for 100% test coverage. Please write tests for any new functionality or changes.
-* Make sure your code meets our linting standards. Run `npm run lint` to check your code.
-* Maintain the existing coding style. There are some settings in `.jsbeautifyrc` to help.
 
 ## Why Flashheart?
 
